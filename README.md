@@ -1,4 +1,4 @@
-# FrameTrim v2 (Windows)
+# FrameTrim (Windows)
 
 Local, manual, frame-accurate video trimmer. Step frame by frame, set start/end, then **Save as NEW file** or **Replace ORIGINAL** (backup is kept).
 
