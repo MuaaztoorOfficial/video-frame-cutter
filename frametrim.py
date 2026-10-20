@@ -321,7 +321,27 @@ class FrameTrimApp:
             if not check.get("streams") or float(check.get("format", {}).get("duration") or 0) <= 0:
                 raise RuntimeError("Temporary output verification failed; original was not changed.")
             shutil.copy2(source, backup)
-            os.replace(temp, source)
+            try:
+                os.replace(temp, source)
+            except PermissionError:
+                # Fallback for Windows replacement restrictions. Keep a recovery rename.
+                parked = source.with_name(source.name + ".frametrim_old")
+                if parked.exists():
+                    raise RuntimeError(f"Safety stop: recovery file already exists: {parked}")
+                try:
+                    os.rename(source, parked)
+                    os.rename(temp, source)
+                    try:
+                        parked.unlink()
+                    except Exception:
+                        pass
+                except Exception:
+                    if not source.exists() and parked.exists():
+                        try:
+                            os.rename(parked, source)
+                        except Exception:
+                            pass
+                    raise
             self.load_path(source)
             self.status.set("Original replaced; backup retained.")
             messagebox.showinfo("Replacement complete",
