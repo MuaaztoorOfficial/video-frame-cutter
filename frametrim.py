@@ -69,7 +69,7 @@ class FrameTrimApp:
         ttk.Button(top, text="Open Folder", command=self.open_folder).pack(side="left", padx=6)
         ttk.Button(top, text="Previous", command=lambda: self.step_file(-1)).pack(side="left", padx=(18, 3))
         ttk.Button(top, text="Next", command=lambda: self.step_file(1)).pack(side="left")
-        ttk.Button(top, text="Preview Current Range", command=self.preview_range).pack(side="right")
+        ttk.Button(top, text="Preview Current Frame", command=self.preview_frame).pack(side="right")
 
         ttk.Label(self.root, textvariable=self.info, padding=(12, 2), wraplength=860).pack(fill="x")
         self.canvas = tk.Canvas(self.root, bg="#181818", height=270, highlightthickness=0)
