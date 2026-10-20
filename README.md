@@ -1,30 +1,24 @@
-# FrameTrim (Windows prototype)
+# FrameTrim v2 (Windows)
 
-FrameTrim is a local, manual video trimmer prototype for checking clips frame-by-frame and optionally replacing the original file after creating and verifying a temporary output.
+Local, manual, frame-accurate video trimmer. Step frame by frame, set start/end, then **Save as NEW file** or **Replace ORIGINAL** (backup is kept).
 
 ## Requirements
-- Windows 10/11
-- Python 3.10+ (for running from source)
-- FFmpeg Windows build including `ffmpeg.exe`, `ffprobe.exe`, and the `libx264` encoder
-- Pillow recommended for JPEG preview: `py -m pip install pillow`
+- Windows 10/11, Python 3.10+ (no pip packages needed)
+- FFmpeg with `libx264`. If it is missing, the app offers to download it automatically into its own folder. Manual option: copy `ffmpeg.exe` + `ffprobe.exe` next to `frametrim.py` (or into `.\ffmpeg`, `.\bin`, `.\ffmpeg-*\bin`), or add them to PATH.
 
-## Setup
-1. Download a Windows FFmpeg build from https://ffmpeg.org/download.html (the site links to Windows builds).
-2. Extract it.
-3. Copy `ffmpeg.exe` and `ffprobe.exe` into the same folder as `frametrim.py`, OR add their `bin` directory to Windows PATH.
-4. Install Pillow: `py -m pip install pillow`
-5. Run: `py frametrim.py`
+## Run
+Double-click `run_frametrim.bat` (or `py frametrim.py`). You can also drag a video onto the .bat.
 
 ## Use
-1. Click **Open Clip** or **Open Folder**.
-2. Use Left/Right arrows for frame stepping. Shift+Left/Shift+Right moves 10 frames. Space refreshes preview.
-3. Set the start and end frames. End is exclusive: for example, start 10 and end 100 keeps frames 10–99.
-4. Use **Save as NEW file** first to test.
-5. **Replace ORIGINAL** creates a `.bak.original` backup, renders a temporary MP4, verifies it, then replaces the source. It stops if a previous temp/backup exists.
+1. **Open Clip** / **Open Folder** (Previous/Next switch clips).
+2. Navigate: ←/→ = 1 frame, Shift+←/→ = 10, Home/End, slider, or type a frame number + Enter.
+3. **I** (or "Set start") and **O** (or "Set end") mark the range. End is exclusive: start 10, end 100 keeps frames 10-99. The preview shows KEPT / TRIMMED OUT.
+4. **Save as NEW file** (safe) or **Replace ORIGINAL**. Cancel is available during export.
 
-## Important limitations
-- This is a prototype, not a signed Windows EXE.
-- To make arbitrary frame boundaries practical across mixed codecs, output is re-encoded to H.264/AAC MP4 at CRF 16. This is high quality but NOT bit-for-bit lossless and may change codec/container.
-- Frame stepping uses the average frame rate and timestamp seeking, so variable-frame-rate media may not map perfectly to source frame numbers. For critical work, validate the result visually and keep the backup.
-- The original file's extension is retained when replaced even though output is MP4; for non-MP4 originals, this can cause a container/extension mismatch. For safety, this prototype should only be used for MP4 originals in Replace Original mode. For other formats use Save as NEW file, or convert/copy originals to MP4 first.
-- This prototype's preview is basic and does not include audio waveform or real-time playback.
+## What Replace ORIGINAL does
+Exports to a temp file, verifies the frame count, renames the original to `.bak.original` (unique name, never overwritten), then moves the new file in. If any step fails the original is restored. Non-MP4 originals (mkv, mov, ts...) become `name.mp4`; the original stays as the backup.
+
+## Notes
+- Output is re-encoded (H.264 CRF 16, AAC 192k, MP4): very high quality, not bit-for-bit lossless. 10-bit/HDR sources are converted to 8-bit SDR yuv420p.
+- Variable-frame-rate clips (phone videos) are flagged; frame numbers are approximate there, so check the result.
+- Errors are logged to `frametrim_error.log` next to the app.
